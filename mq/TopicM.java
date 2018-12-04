@@ -34,6 +34,7 @@ public class TopicM
     public static final String TOPIC_QUEUE2 = "topic.queue2";
     public static final String TOPIC_EXCHANGE = "topic.exchange";
     
+    
     @Bean
     public Queue topicQueue1() {
         return new Queue(TOPIC_QUEUE1);

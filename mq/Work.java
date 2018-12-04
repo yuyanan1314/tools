@@ -11,14 +11,17 @@
  */
 package com.yyn.demo.mq;
 
+import java.io.IOException;
+
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 
+import com.rabbitmq.client.Channel;
 import com.yyn.demo.mq.Send.User;
 
 /**    
@@ -39,12 +42,13 @@ public class Work
     }
     
     @RabbitListener(queues = workQueue)
-    public void processMessage1(String content) {
+    public void processMessage1(@Payload User content,@Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag, Channel channel) throws IOException {
+       channel.basicAck(deliveryTag, false);
         System.out.println("work_polling_11111:----"+content);
     }
     
     @RabbitListener(queues = workQueue)
-    public void processMessage2(String content) {
+    public void processMessage2(User content, Channel channel) {
         System.out.println("work_polling_22222----"+content);
     }
 }
