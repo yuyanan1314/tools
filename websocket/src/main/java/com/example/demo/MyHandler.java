@@ -24,6 +24,7 @@ public class MyHandler implements WebSocketHandler {
      */
     private final static List<WebSocketSession> SESSIONS = Collections.synchronizedList(new ArrayList<>());
 
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         log.info("链接成功......");
