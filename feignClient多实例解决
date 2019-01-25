@@ -1,0 +1,34 @@
+Feign有一个局限性，即对于同一个service-id只能使用一个配置类，如果有多个@FeignClient注解使用了相同的name属性，则注解的configuration参数会被覆盖。至于谁覆盖谁要看Spring容器初始化Bean的顺序。
+这个问题的有效解决方案是，当你需要给一个service-id配置第二个@FeignClient时，使用Feign Builder API手动创建接口代理，而不是通过注解
+@Import(FeignClientsConfiguration.class)
+class FooController {
+
+    private FooClient fooClient;
+
+    private FooClient adminClient;
+
+        @Autowired
+    public FooController(
+            Decoder decoder, Encoder encoder, Client client) {
+        this.fooClient = Feign.builder().client(client)
+                .encoder(encoder)
+                .decoder(decoder)
+                .contract(new SpringMvcContract())
+                .requestInterceptor(new BasicAuthRequestInterceptor("user", "user"))
+                .target(FooClient.class, "http://PROD-SVC");
+        this.adminClient = Feign.builder().client(client)
+                .encoder(encoder)
+                .decoder(decoder)
+                .contract(new SpringMvcContract())
+                .requestInterceptor(new BasicAuthRequestInterceptor("admin", "admin"))
+                .target(FooClient.class, "http://PROD-SVC");
+    }
+}
+
+官网文档对这种情况也有说明：http://cloud.spring.io/spring-cloud-static/Edgware.SR2/single/spring-cloud.html#_creating_feign_clients_manually
+构造Feign时需要的encoder, decoder, client都可以从容器中注入，这样构造出来的feign代理对象与我们使用@FeignClient注解功能上是完全一样的。
+
+作者：司青玄
+链接：https://www.jianshu.com/p/634011bbfab6
+來源：简书
+简书著作权归作者所有，任何形式的转载都请联系作者获得授权并注明出处。
